@@ -1,2 +1,2 @@
 # LearnAF
-A cross-platform machine learning library based on ArrayFirre
+A hardware agnostic machine learning library based on ArrayFirre
