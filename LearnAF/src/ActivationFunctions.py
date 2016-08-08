@@ -1,6 +1,5 @@
 # ActivationFunctions.py
 
-import numpy as np
 import arrayfire as af
 
 class ActivationFunctions:
