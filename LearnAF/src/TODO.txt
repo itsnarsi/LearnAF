@@ -1,0 +1,6 @@
+TODO.txt
+
+Comment the code
+	* What does x mean in each activation function?
+	* What naming convention are we following?
+	* What is the package architecture?
