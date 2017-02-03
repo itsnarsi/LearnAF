@@ -5,7 +5,7 @@ Point = "Dict[str, float]"
 
 class AG:
     def eval(self, point: Point) -> float:
-
+        
         return self._eval(point, {})
     
     def _eval(self,point: Point, cache: dict) -> float:
@@ -13,7 +13,6 @@ class AG:
         raise NotImplementedError
     
     def grad(self, point: Point) -> Point:
-
         cache = {}
         self._eval(point, cache)
         G = {key: 0 for key in point}
@@ -39,7 +38,6 @@ class AG:
     def __pow__(self, other):
         return Pow(self, other)
 
-    
 class Variable(AG, namedtuple("Variable", ["name"])):
     def _eval(self, point, cache):
         cache[id(self)] = point[self.name]
@@ -117,3 +115,38 @@ class Pow(AG, namedtuple("Pow", ["AG1", "AG2"])):
 
         self.AG1._grad(point, adjoint * exp * base ** (exp - 1), gradient, cache)
         self.AG2._grad(point, adjoint * af.arith.log(base) * base ** exp, gradient, cache)
+
+class sin(AG, namedtuple("sin", ["AG1"])):
+    def _eval(self, point, cache):
+        if id(self) not in cache:
+            eval1 = self.AG1._eval
+            cache[id(self)] = af.arith.sin(eval1(point, cache))
+        return cache[id(self)]
+
+    def _grad(self, point, adjoint, gradient, cache):
+        a = cache[id(self.AG1)]
+        self.AG1._grad(point, adjoint * af.arith.cos(a), gradient, cache)
+        
+        
+class cos(AG, namedtuple("cos", ["AG1"])):
+    def _eval(self, point, cache):
+        if id(self) not in cache:
+            eval1 = self.AG1._eval
+            cache[id(self)] = af.arith.cos(eval1(point, cache))
+        return cache[id(self)]
+
+    def _grad(self, point, adjoint, gradient, cache):
+        a = cache[id(self.AG1)]
+        self.AG1._grad(point, -adjoint * af.arith.sin(a), gradient, cache)
+
+
+class exp(AG, namedtuple("exp", ["AG1"])):
+    def _eval(self, point, cache):
+        if id(self) not in cache:
+            eval1 = self.AG1._eval
+            cache[id(self)] = af.arith.exp(eval1(point, cache))
+        return cache[id(self)]
+
+    def _grad(self, point, adjoint, gradient, cache):
+        a = cache[id(self.AG1)]
+        self.AG1._grad(point, adjoint * af.arith.exp(a), gradient, cache)
