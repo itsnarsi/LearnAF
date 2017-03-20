@@ -89,10 +89,8 @@ class Multiply(AG, namedtuple("Multiply", ["AG1", "AG2"])):
         return cache[id(self)]
 
     def _grad(self, adjoint, gradient, cache):
-        lhs = cache[id(self.AG1)]
-        rhs = cache[id(self.AG2)]
-        self.AG1._grad(adjoint * rhs, gradient, cache)
-        self.AG2._grad(adjoint * lhs, gradient, cache)
+        self.AG1._grad(adjoint * cache[id(self.AG2)], gradient, cache)
+        self.AG2._grad(adjoint * cache[id(self.AG1)], gradient, cache)
 
 class Divide(AG, namedtuple("Divide", ["AG1", "AG2"])):
     def _eval(self, cache):
@@ -121,30 +119,6 @@ class Pow(AG, namedtuple("Pow", ["AG1", "AG2"])):
         self.AG1._grad(adjoint * exp * base ** (exp - 1), gradient, cache)
         self.AG2._grad(adjoint * af.arith.log(base) * base ** exp, gradient, cache)
 
-class sin(AG, namedtuple("sin", ["AG1"])):
-    def _eval(self, cache):
-        if id(self) not in cache:
-            eval1 = self.AG1._eval
-            cache[id(self)] = af.arith.sin(eval1(cache))
-        return cache[id(self)]
-
-    def _grad(self, adjoint, gradient, cache):
-        a = cache[id(self.AG1)]
-        self.AG1._grad(adjoint * af.arith.cos(a), gradient, cache)
-        
-        
-class cos(AG, namedtuple("cos", ["AG1"])):
-    def _eval(self, cache):
-        if id(self) not in cache:
-            eval1 = self.AG1._eval
-            cache[id(self)] = af.arith.cos(eval1(cache))
-        return cache[id(self)]
-
-    def _grad(self, adjoint, gradient, cache):
-        a = cache[id(self.AG1)]
-        self.AG1._grad(-adjoint * af.arith.sin(a), gradient, cache)
-
-
 class exp(AG, namedtuple("exp", ["AG1"])):
     def _eval(self, cache):
         if id(self) not in cache:
@@ -153,5 +127,4 @@ class exp(AG, namedtuple("exp", ["AG1"])):
         return cache[id(self)]
 
     def _grad(self, adjoint, gradient, cache):
-        a = cache[id(self.AG1)]
-        self.AG1._grad(adjoint * af.arith.exp(a), gradient, cache)
+        self.AG1._grad(adjoint * af.arith.exp(cache[id(self.AG1)]), gradient, cache)
