@@ -1,5 +1,6 @@
 import arrayfire as af
 from collections import namedtuple
+import numpy as np
 
 Point = "Dict[str, float]"
 
@@ -18,7 +19,8 @@ class AG:
         G = {}
         for i in range(len(variables)):
             G[variables[i].name] = 0
-        self._grad(1, G, cache)
+        #af.np_to_af_array(np.asarray([1], dtype = np.float32))
+        self._grad(1.0, G, cache)
         return G
 
     def _grad(self, adjoint: float, gradient: Point, cache):

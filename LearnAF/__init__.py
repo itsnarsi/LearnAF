@@ -1,2 +1,2 @@
 from .ops import *
-from .layers import *
+from .nn import *
