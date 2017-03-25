@@ -41,6 +41,15 @@ class AG:
 
     def __pow__(self, other):
         return Pow(self, other)
+    
+    def unbroadcast(self, adjoint, shape_arg):
+        if adjoint.shape == shape_arg:
+            return adjoint
+        else:
+            if len(shape_arg) == 1:
+                return af.sum(adjoint)
+            else:
+                return af.sum(adjoint, dim = np.argmin(shape_arg))
 
 class Variable(AG):
     def __init__(self,value,name=None):
