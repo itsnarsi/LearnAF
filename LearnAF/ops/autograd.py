@@ -20,7 +20,7 @@ class AG:
         for i in range(len(variables)):
             G[variables[i].name] = 0
         #af.np_to_af_array(np.asarray([1], dtype = np.float32))
-        self._grad(1.0, G, cache)
+        self._grad(af.constant(1.0,1), G, cache)
         return G
 
     def _grad(self, adjoint: float, gradient: Point, cache):
@@ -42,12 +42,24 @@ class AG:
     def __pow__(self, other):
         return Pow(self, other)
     
+    @af.broadcast
+    def ADD_CAST(self, lhs, rhs):
+        return lhs + rhs
+
+    @af.broadcast
+    def SUB_CAST(self, lhs, rhs):
+        return lhs - rhs
+
+    @af.broadcast
+    def MUL_CAST(self, lhs, rhs):
+        return lhs * rhs
+
     def unbroadcast(self, adjoint, shape_arg):
         if adjoint.shape == shape_arg:
             return adjoint
         else:
             if len(shape_arg) == 1:
-                return af.sum(adjoint)
+                return af.constant(af.sum(adjoint),1)
             else:
                 return af.sum(adjoint, dim = np.argmin(shape_arg))
 
