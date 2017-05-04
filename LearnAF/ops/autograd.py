@@ -18,7 +18,7 @@ class AG:
         self._eval(cache)
         G = {}
         for i in range(len(variables)):
-            G[variables[i].name] = 0
+            G[variables[i].name] = af.constant(0.0,1)
         #af.np_to_af_array(np.asarray([1], dtype = np.float32))
         self._grad(af.constant(1.0,1), G, cache)
         return G
@@ -72,7 +72,7 @@ class Variable(AG):
         return cache[id(self)]
 
     def _grad(self, adjoint, gradient, cache):
-        gradient[self.name] += adjoint
+        gradient[self.name] = adjoint
 
 class Constant(AG, namedtuple("Constant", ["value"])):
     def _eval(self, cache):
