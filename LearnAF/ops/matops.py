@@ -1,6 +1,7 @@
 from .autograd import *
 import arrayfire as af
 from collections import namedtuple
+import time
 
 class matmul(AG, namedtuple("matmul", ["AG1","AG2"])):
     def _eval(self, cache):
@@ -11,6 +12,7 @@ class matmul(AG, namedtuple("matmul", ["AG1","AG2"])):
         return cache[id(self)]
 
     def _grad(self, adjoint, gradient, cache):
+
         if adjoint.shape == (1,):
             self.AG1._grad(cache[id(self.AG2)] * adjoint, gradient, cache)
             self.AG2._grad(cache[id(self.AG1)] * adjoint, gradient, cache)

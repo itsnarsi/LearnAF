@@ -13,9 +13,11 @@ class SGD:
         self.nesterov = nesterov
 
     def update(self, loss, weights, epoch):
-        error = loss.eval()
-        weight_grads = loss.grad(weights)
 
+        error = loss.eval()
+
+
+        weight_grads = loss.grad(weights)
         if self.decay > 0:
             self.lr *= (1. / (1. + self.decay * epoch))
         
@@ -34,4 +36,5 @@ class SGD:
             self.moments[wk_id] = v
             weights[wk_id].value += v
             weight_updates.append(weights[wk_id])
+        
         return (error,weight_updates)

@@ -6,21 +6,22 @@ Point = "Dict[str, float]"
 
 class AG:
     def eval(self) -> float:
-        
-        return self._eval({})
+        self.chache = {}
+        return self._eval(self.chache)
     
     def _eval(self, cache: dict) -> float:
 
         raise NotImplementedError
     
     def grad(self, variables) -> Point:
-        cache = {}
-        self._eval(cache)
+        if ~hasattr(self, 'cache'):
+            self.cache = {}
+            self._eval(self.cache)
         G = {}
         for i in range(len(variables)):
             G[variables[i].name] = af.constant(0.0,1)
         #af.np_to_af_array(np.asarray([1], dtype = np.float32))
-        self._grad(af.constant(1.0,1), G, cache)
+        self._grad(af.constant(1.0,1), G, self.cache)
         return G
 
     def _grad(self, adjoint: float, gradient: Point, cache):
@@ -59,7 +60,7 @@ class AG:
             return adjoint
         else:
             if len(shape_arg) == 1:
-                return af.constant(af.sum(adjoint),1)
+                return af.sum(adjoint)#af.constant(af.sum(adjoint),1)
             else:
                 return af.sum(adjoint, dim = np.argmin(shape_arg))
 
@@ -74,7 +75,9 @@ class Variable(AG):
     def _grad(self, adjoint, gradient, cache):
         gradient[self.name] = adjoint
 
-class Constant(AG, namedtuple("Constant", ["value"])):
+class Constant(AG):
+    def __init__(self,value):
+        self.value = value
     def _eval(self, cache):
         cache[id(self)] = self.value
         return self.value
