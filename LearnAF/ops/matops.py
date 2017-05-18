@@ -8,17 +8,23 @@ class matmul(AG, namedtuple("matmul", ["AG1","AG2"])):
         if id(self) not in cache:
             eval1 = self.AG1._eval
             eval2 = self.AG2._eval
-            cache[id(self)] = af.blas.matmul(eval1(cache),eval2(cache))
+            ops = af.blas.matmul(eval1(cache),eval2(cache))
+            af.eval(ops)
+            cache[id(self)] = ops
         return cache[id(self)]
 
     def _grad(self, adjoint, gradient, cache):
 
         if adjoint.shape == (1,):
-            self.AG1._grad(cache[id(self.AG2)] * adjoint, gradient, cache)
-            self.AG2._grad(cache[id(self.AG1)] * adjoint, gradient, cache)
+            ops1 = cache[id(self.AG2)] * adjoint
+            ops2 = cache[id(self.AG1)] * adjoint
         else:
-            self.AG1._grad(af.blas.matmulNT(adjoint, cache[id(self.AG2)]), gradient, cache)
-            self.AG2._grad(af.blas.matmulTN(cache[id(self.AG1)], adjoint), gradient, cache)
+            ops1 = af.blas.matmulNT(adjoint, cache[id(self.AG2)])
+            ops2 = af.blas.matmulTN(cache[id(self.AG1)], adjoint)
+        af.eval(ops1)
+        af.eval(ops2)
+        self.AG1._grad(ops1, gradient, cache)
+        self.AG2._grad(ops2, gradient, cache)
 
 class add(AG, namedtuple("add", ["AG1","AG2"])):
     
@@ -26,8 +32,10 @@ class add(AG, namedtuple("add", ["AG1","AG2"])):
         if id(self) not in cache:
             eval1 = self.AG1._eval
             eval2 = self.AG2._eval
-            cache[id(self)] = self.ADD_CAST(eval1(cache), eval2(cache))
-
+            ops = self.ADD_CAST(eval1(cache), eval2(cache))
+            af.eval(ops)
+            cache[id(self)] = ops
+            
         #print('add<-'+str(cache[id(self)].dtype()))
         return cache[id(self)]
 

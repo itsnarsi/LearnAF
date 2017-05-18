@@ -45,25 +45,33 @@ class AG:
     
     @af.broadcast
     def ADD_CAST(self, lhs, rhs):
-        return lhs + rhs
+        ops = lhs + rhs
+        af.eval(ops)
+        return ops
 
     @af.broadcast
     def SUB_CAST(self, lhs, rhs):
-        return lhs - rhs
+        ops = lhs - rhs
+        af.eval(ops)
+        return ops
 
     @af.broadcast
     def MUL_CAST(self, lhs, rhs):
-        return lhs * rhs
+        ops = lhs * rhs
+        af.eval(ops)
+        return ops
 
     def unbroadcast(self, adjoint, shape_arg):
         if adjoint.shape == shape_arg:
-            return adjoint
+            ops = adjoint
         else:
             if len(shape_arg) == 1:
-                return af.sum(adjoint)#af.constant(af.sum(adjoint),1)
+                ops = af.sum(adjoint)
             else:
                 (a,dim) = af.imax(shape_arg)
-                return af.sum(adjoint, dim = dim)
+                ops = af.sum(adjoint, dim = dim)
+                af.eval(ops)
+        return ops
 
 class Variable(AG):
     def __init__(self,value,name=None):
