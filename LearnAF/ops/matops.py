@@ -27,6 +27,8 @@ class add(AG, namedtuple("add", ["AG1","AG2"])):
             eval1 = self.AG1._eval
             eval2 = self.AG2._eval
             cache[id(self)] = self.ADD_CAST(eval1(cache), eval2(cache))
+
+        #print('add<-'+str(cache[id(self)].dtype()))
         return cache[id(self)]
 
     def _grad(self, adjoint, gradient, cache):

@@ -62,7 +62,8 @@ class AG:
             if len(shape_arg) == 1:
                 return af.sum(adjoint)#af.constant(af.sum(adjoint),1)
             else:
-                return af.sum(adjoint, dim = np.argmin(shape_arg))
+                (a,dim) = af.imax(shape_arg)
+                return af.sum(adjoint, dim = dim)
 
 class Variable(AG):
     def __init__(self,value,name=None):
