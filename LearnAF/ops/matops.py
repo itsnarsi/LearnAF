@@ -9,7 +9,7 @@ class matmul(AG, namedtuple("matmul", ["AG1","AG2"])):
             eval1 = self.AG1._eval
             eval2 = self.AG2._eval
             ops = af.blas.matmul(eval1(cache),eval2(cache))
-            af.eval(ops)
+            #af.eval(ops)
             cache[id(self)] = ops
         return cache[id(self)]
 
@@ -21,8 +21,8 @@ class matmul(AG, namedtuple("matmul", ["AG1","AG2"])):
         else:
             ops1 = af.blas.matmulNT(adjoint, cache[id(self.AG2)])
             ops2 = af.blas.matmulTN(cache[id(self.AG1)], adjoint)
-        af.eval(ops1)
-        af.eval(ops2)
+        #af.eval(ops1)
+        #af.eval(ops2)
         self.AG1._grad(ops1, gradient, cache)
         self.AG2._grad(ops2, gradient, cache)
 
@@ -33,7 +33,7 @@ class add(AG, namedtuple("add", ["AG1","AG2"])):
             eval1 = self.AG1._eval
             eval2 = self.AG2._eval
             ops = self.ADD_CAST(eval1(cache), eval2(cache))
-            af.eval(ops)
+            #af.eval(ops)
             cache[id(self)] = ops
             
         #print('add<-'+str(cache[id(self)].dtype()))

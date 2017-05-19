@@ -46,19 +46,19 @@ class AG:
     @af.broadcast
     def ADD_CAST(self, lhs, rhs):
         ops = lhs + rhs
-        af.eval(ops)
+        #af.eval(ops)
         return ops
 
     @af.broadcast
     def SUB_CAST(self, lhs, rhs):
         ops = lhs - rhs
-        af.eval(ops)
+        #af.eval(ops)
         return ops
 
     @af.broadcast
     def MUL_CAST(self, lhs, rhs):
         ops = lhs * rhs
-        af.eval(ops)
+        #af.eval(ops)
         return ops
 
     def unbroadcast(self, adjoint, shape_arg):
@@ -70,7 +70,7 @@ class AG:
             else:
                 (a,dim) = af.imax(shape_arg)
                 ops = af.sum(adjoint, dim = dim)
-                af.eval(ops)
+                #af.eval(ops)
         return ops
 
 class Variable(AG):
