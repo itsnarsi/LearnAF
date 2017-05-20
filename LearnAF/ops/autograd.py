@@ -61,6 +61,12 @@ class AG:
         #af.eval(ops)
         return ops
 
+    @af.broadcast
+    def DIV_CAST(self, lhs, rhs):
+        ops = lhs / rhs
+        #af.eval(ops)
+        return ops
+
     def unbroadcast(self, adjoint, shape_arg):
         if adjoint.shape == shape_arg:
             ops = adjoint
