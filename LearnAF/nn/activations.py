@@ -35,14 +35,26 @@ class relu(AG, namedtuple("relu", ["AG1"])):
     def _eval(self, cache):
         if id(self) not in cache:
             eval1 = self.AG1._eval(cache)
-            ops = eval1 > 0
-            ops = eval1 * ops.as_type(af.Dtype.f32)
+            x = list(eval1.shape)
+            dims = [None,None,None,None]
+            for i in range(len(x)):
+                dims[i] = x[i]
+            zeros = af.data.constant(0, dims[0], d1=dims[1], d2=dims[2], d3=dims[3], dtype = af.Dtype.f32)
+            cond = eval1 > zeros
+            ops = af.select(cond, eval1, zeros)
+            ops = eval1 * ops
             cache[id(self)] = ops
         return cache[id(self)]
 
     def _grad(self, adjoint, gradient, cache):
-        a = cache[id(self)] > 0
-        g = a.as_type(af.Dtype.f32)
+        eval1 = self.AG1._eval(cache)
+        x = list(eval1.shape)
+        dims = [None,None,None,None]
+        for i in range(len(x)):
+            dims[i] = x[i]
+        zeros = af.data.constant(0, dims[0], d1=dims[1], d2=dims[2], d3=dims[3], dtype = af.Dtype.f32)
+        cond = eval1 > zeros
+        g = af.select(cond, eval1, zeros)
         self.AG1._grad(g * adjoint, gradient, cache)
 
 class softmax(AG, namedtuple("softmax", ["AG1"])):
@@ -56,5 +68,5 @@ class softmax(AG, namedtuple("softmax", ["AG1"])):
 
     def _grad(self, adjoint, gradient, cache):
         a = cache[id(self)]
-        g = a * (1 - a)* adjoint
+        g = af.arith.cast(a * (1 - a)* adjoint, af.Dtype.f32)
         self.AG1._grad(g, gradient, cache)
